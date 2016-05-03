@@ -1,0 +1,33 @@
+Tell Git who you are -
+git init
+git config --global user.name "yatendra"
+git config --global user.email yatendra.kr.sharma@gmail.com
+
+# Add remote origin address
+# No need to add again and again If already added once
+git remote add origin https://github.com/yatendrakumar/General_Descriptions.git
+
+# Clone it into your local system (Local Copy)
+git clone -b master https://github.com/yatendrakumar/General_Descriptions.git
+
+# To create or move to other branch
+git checkout -b new_branch_name
+
+# To check the current version/Commit number of your cloned source (In linux)
+cat .git/refs/heads/branch_name
+
+# Check existing branchs with checked current branches
+git branch
+
+# After doing some changes check the status (Add/remove files/folders)
+git status
+
+# Add evrything 
+# if not able to add use "git add 'filename'"
+git add *
+
+# Commit your source with some commiting messages
+git commit -am "Commiting message"
+
+# push it into the git repo
+git push origin branch_name
