@@ -1,0 +1,23 @@
+To install the perl modules using MCPAN 
+
+perl -MCPAN -e 'install Gtk2'
+
+
+For all some important modules.
+libxml-*-perl
+
+
+
+to list out the modules which are installed + select a module
+
+use this "instmodsh" command 
+
+
+this command will show only the module names
+apt-cache search tree | grep perl | awk -v x=1 '{print $1}' > file 
+
+then do sed ':a;N;$!ba;s/\n/ /g' file 
+it will show all the modules name in the terminal so select them and run 
+
+
+sudo apt-get install <modules name> 

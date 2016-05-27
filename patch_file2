@@ -1,0 +1,85 @@
+********************************* patch file creation and how to patch ?
+
+before doing this, please backup your source code, patch wrongly 
+will screwup your source code.
+
+********************************* how to create patch file?
+
+Patch file is a readable file that created by diff with -c 
+(context output format). 
+
+It doesn’t matter and if you wanna know more, man diff. 
+
+To patch the entire folder of source codes(as usually people do)
+I do as bellow:
+
+Assume Original source code at folder Tb01, and latest source 
+code at folder Tb02. And there have multiple sub directories at 
+Tb01 and Tb02 too.
+
+====> diff -crB Tb01 Tb02 > Tb02.patch
+
+-c context, -r recursive (multiple levels dir), -B is to ignore
+Blank Lines.
+
+put -B because blank lines is really useless for patching, 
+sometimes I need to manually read the patch file to track the changes, \
+without -B is really headache.
+
+********************************** How to patch?
+
+First of all, please do a dry-run before really patch it. 
+
+Bare in mind, patch will be working very specifically. 
+
+Let say the version 3 Tb03.patch is use to patch from Tb02, 
+if you apply patch on Tb01, sometimes it will corrupt your source code. 
+So, to make sure it works, do a dry run. 
+
+Dry-run means a fake-test, do it at the directory of the source code 
+targeted to patch.
+
+Doing dry-run like this:
+
+====> patch --dry-run -p1 -i Tb02.patch
+
+The success output looks like this:
+
+patching file TbApi.cpp
+patching file TbApi.h
+patching file TbCard.cpp
+...
+
+The failure ouptut looks like this:
+
+patching file TbCard.cpp
+Hunk #2 FAILED at 585.
+1 out of 2 hunks FAILED -- saving rejects to file TbCard.cpp.rej
+patching file TbCard.h
+Hunk #1 FAILED at 57.
+Hunk #2 FAILED at 77.
+Hunk #3 succeeded at 83 with fuzz 1 (offset -21 lines).
+....
+
+
+At last, if the dry-run is giving good result, 
+do this and enjoy the compilation.
+
+
+====> patch -p1 -i Tb02.patch
+
+******************************************************************************************
+
+Second, if there were files in Tb02 that did not exist in Tb01 and 
+you want them included in the patch, give diff the -N option:
+
+diff -crBN Tb01 Tb02 > Tb02.patch
+
+Lastly, I’d note that diff and patch really only work with text files. 
+It can’t deal with jpegs, pdfs, or other binary objects.
+
+This can be a bit of a pain for web and GUI developers.
+
+
+
+

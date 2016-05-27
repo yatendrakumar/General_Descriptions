@@ -1,0 +1,11 @@
+
+
+---->if you want to search that the package is there or not ( msp ) 
+
+sudo apt-cache search msp
+OR 
+sudo apt-cache search msp
+
+---->if you have the package in deb format.
+
+dpkg -i google-chrome-stable_current_amd64.deb 

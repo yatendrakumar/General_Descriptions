@@ -1,0 +1,12 @@
+what is VFS  vitual file system ????/
+
+defined link between operating system kernel and different file systems
+
+supplies application with the system call for the file management 
+( like open, read ) maintain internal data str and passes appropriate 
+task to appropraite file system
+
+provide standard actions ( lseek )
+
+no file system will actually provide lseek
+

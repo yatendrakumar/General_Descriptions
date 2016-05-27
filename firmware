@@ -1,0 +1,33 @@
+what is firmware ?.....
+
+s/w that is embedded in a h/w device.
+
+it is often provided on the flash ROMS or as a binary image file
+that can be uploaded onto exiting h/w by a user.
+
+computer program in a ROM, EEPROM whose program may be modified 
+by external h/w but not by application program.
+
+flash disk -- popular form of the firmware
+
+was originally coined to indicate a functional replacement for the 
+h/w on a low cost u.processor
+
+eg. media recorder, CDROM, BIOS 
+
+computer chips have code embedded on itself to run is firmware 
+
+is a term sometimes used to denote the fixed, usaually 
+rather small programs that internally control various electronic devices.
+
+devices like camera, mobile phone, calculator contain firmware to enable
+the device basic operatio as well as implementing higher level function.
+
+firmware is always involved with very basic low - level operations in a
+device.
+
+while more complex firmware often employ flash memory to allow for updates
+
+updating firmware means fixing bugs or adding features so usually involve
+loading a binary image file provided by the manufactured into the device.
+

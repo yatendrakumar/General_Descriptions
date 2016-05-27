@@ -1,0 +1,30 @@
+problem------------------------------------
+
+gcc: error: elf_x86_64: No such file or directory
+
+
+
+
+In arch/x86/vdso/Makefile
+
+
+
+replace "-m elf_x86_64" by "-m64" on the line starting with
+VDSO_LDFLAGS_vdso.lds
+
+replace "-m elf_x86" by "-m32" on the line starting with 
+VDSO_LDFLAGS_vdso32.ld
+
+start----------------------------------------
+
+
+1) need 
+
+kdb-v4.2-2.4.20-common-1.bz2 and kdb-v4.2-2.4.20-i386-1.bz2.
+
+here 2.4.20 is the kernel version same kernel is needed.
+
+
+2)
+
+

@@ -1,0 +1,65 @@
+********************different file types associated with drivers***********************
+
+We all know the importance of device drivers. 
+These small files help operating systems communicate with the 
+hardware devices and peripherals installed on a PC.
+ 
+Most of your devices will not work in the absence of proper drivers,
+no matter how expensive those devices are. 
+Driver files usually come in disks with any new hardware device
+or peripheral that you may purchase. 
+
+However, if you wish to upgrade your device drivers in order to 
+make your system function more efficiently, you will have to 
+download those from the internet.
+
+Device driver files can be of different types, each one representing 
+a different kind of device. These can have different file extensions
+as well. The most common file extensions include:
+
+
+---> DLL – 
+The extension DLL is an abbreviation of the term Dynamic Link Library.
+DLL files are executable files, meaning these can be called and run 
+by a loader program, either belonging to the operating system itself, 
+or a third party software utility. One noticeable plus point of DLL 
+files is that most of these can be replaced in case of a file corruption, 
+without having to reinstall the entire driver file. 
+DLL files can contain data, resources and code in any combination, 
+and are built into many operating systems, including Microsoft Windows 
+and OS/2.
+
+----> INF – 
+An INF file is a plain text file that Microsoft Windows uses in order
+to load software packages and device drivers for hardware components. 
+The INF file resembles the INI file in structure. 
+
+It contains information stating which way the Windows registry should 
+be modified and the files that have to be copied during the installation. 
+These files are part of the Setup API of Windows.
+
+----> OCX – 
+If you have Microsoft Windows loaded in your PC, then you will 
+definitely find a number of files with the extension ocx in your 
+Windows folder. These files are special programs, created to allow 
+certain functions, such as, resizing of a window or defining how 
+scroll bars will be used in a custom-made program. 
+The use of OCX files in programs improves the overall quality of those programs.
+
+--->  VXD – 
+These files are meant to help the executable files of certain 
+programs to run efficiently, as well as enhancing the features 
+of the program. Every version of Windows has some VXD files built 
+into it. If these files get corrupted somehow, Windows may not 
+boot up at all. In that case, the files need to be repaired or 
+replaced using a Windows installation disk.
+
+Driver files are some of the most important files in your PC, 
+besides the operating system. 
+
+
+These files should be updated at regular intervals in order to 
+keep your PC running in a problem-free, efficient manner.
+
+
+

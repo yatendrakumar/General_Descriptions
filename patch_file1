@@ -1,0 +1,28 @@
+
+To patch a file means to modify it, with the connotation 
+that the modification is generally small. 
+
+The usage comes from the general English usage where a patch 
+is a small modification (to a piece of cloth, for example). 
+
+When it comes to files, a patch is not always a repair.
+
+A patch is a series of instructions that describe how to modify 
+a file or a set of files. 
+
+In the unix world, a patch is usually the output of the diff command, 
+describing changes in a text file. A patch in this sense describes 
+the modifications in terms of adding, removing or modifying lines 
+in the files. The patch utility applies these instructions to modify 
+a file or set of files. 
+
+
+It tries to be smart about applying multiple patches to the same file, 
+as the first patch could cause changes that prevent the second one 
+from being applies because the file is no longer in the expected state. 
+Because diff and patch strongly base their operation on lines, 
+they are not well-suited to binary files.
+
+
+
+

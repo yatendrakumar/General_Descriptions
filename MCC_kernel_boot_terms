@@ -1,0 +1,210 @@
+
+02/23/2013 01:55:10 PM 
+
+
+/* Author ---> yatendra */
+
+/* this document is basically for "the calibrating delay loop ... " which i was getting at the time of MMC kernel booting.  
+*/
+
+
+Basically this is a function of Linux which tells it how powerful the processor is, and how long the delay is between instructions.    
+
+
+Kernel Boot
+Look at messages generated during kernel boot and explore the internals of the more interesting ones.
+By Sreekrishnan Venkateswaran	
+Thursday, June 15th, 2006
+In this month’s “Gearheads” column, let’s take a look at the protected mode boot process. Let’s skim through kernel boot messages and hit the brakes whenever something looks interesting.
+
+
+Boot-Up Overview
+Linux boot on x86- based hardware is set into motion when the BIOS loads the Master Boot Record (MBR) from the boot device. Code residing in the MBR looks at the partition table and reads a Linux bootloader such as GRUB, LILO, or SYSLINUX from the active partition. The final stage of the bootloader loads the compressed kernel image and then passes control to the kernel, which uncompresses itself and turns on the ignition.
+The first-level kernel initializations are done in real mode assembly. Subsequent start-up is performed in protected mode by the function start_kernel() defined in init/main.c. start_kernel() first initializes the CPU subsystem. Memory and process management operations are put in place soon after. Peripheral buses and I/O devices are started next. As the last step in the boot sequence, the init program, the parent of all Linux processes, is invoked. init executes user space boot scripts to load necessary kernel modules. It finally spawns terminals on consoles and displays the login prompt.
+Each section header in this article is a message generated during the boot progression. The messages were produced on an x86 laptop; the semantics and the messages themselves may change if you are booting the kernel on other architectures.
+
+“BIOS-provided physical RAM map”
+The kernel assembles the system memory map from the BIOS, and this is one of the first boot messages that you’ll see:
+
+BIOS-provided physical RAM map:
+  BIOS-e820: 0000000000000000 - 000000000009f000 (usable)
+  …
+  BIOS-e820: 00000000ff800000 - 0000000100000000 (reserved)
+
+The real mode initialization code uses the BIOS int 0×15 service with function number 0xe820 (hence the string,” BIOS-e820″ in the message above) to obtain the system memory map. The memory map indicates reserved and usable memory ranges, which are used by the kernel to create its free page pool.
+
+“758 MB LOWMEM available”
+The normally addressable kernel memory region (below 896 MB) is called low memory. The kernel memory allocator, kmalloc(), returns memory from this region. Memory beyond 896 MB (called high memory) can be accessed only using special mappings.
+During boot, the kernel calculates and displays the total pages present in each of these memory zones. After boot, this information is available via /proc/meminfo.
+
+“Kernel command line: ro root=/dev/hda7”
+Linux bootloaders usually pass a command-line to the kernel. The parameters contained in the command-line affect the code path traversed during boot. You can add command line parameters to the boot loader configuration file (for instance, /etc/lilo.conf if you are using the LILO boot loader), supply them from the boot loader prompt at run time, or set a default command-line during kernel configuration.
+In the message Kernel command line: ro root=/dev/hda7, root=/dev/hda7 announces that the root file system resides in disk partition number 7. ro indicates that the root partition has to be mounted read-only.
+Let’s examine how to vary the boot code path according to command-line parameters passed to the kernel. Assume that the command-line parameter of interest is called is_diag. Setting this parameter to 1 prints verbose debug messages during boot up and switches to a runlevel of three at the end of the boot. If is_diag is instead set to 0, the boot is relatively laconic, and the runlevel is set to two. Listing One implements this code as part of init/main.c.
+Listing One: Accessing the kernel command-line from real mode
+
+static unsigned int diag_mode=1;
+
+static int __init
+is_diag_setup (char *str)
+{
+get_option(&str, &diag_mode);
+return 1;
+
+}
+
+__setup(“is_diag=”, is_diag_setup); /* Handle “is_diag=” */
+
+
+/* Use “is_diag” elsewhere */
+
+/* … */
+
+if (is_diag) {
+/* Print verbose output */
+}
+
+/* … */
+
+/* If is_diag=1, choose an init runlevel of 3, else
+switch to a run level of 2
+*/
+if (is_diag) {
+argv_init[++args] = “3″;
+} else {
+argv_init[++args] = “2″;
+}
+
+/* … */
+
+“Calibrating Delay Loop… 3192.52 BogoMIPS”
+During boot, the kernel calculates the number of times the processor can execute an internal delay-loop in one jiffy, which is the time interval between two consecutive timer ticks. (Naturally, the calculation has to be calibrated to the processing speed of your CPU.) The result of this calibration is stored in a kernel variable called loops_per_jiffy. Busy-waiting for short durations is accomplished with the help of loops_per_jiffy. To generate a delay of one microsecond, you delay-loop (HZ/1000000)*loops_per_jiffy times.
+To understand the delay-loop calibration code, take a peek at function calibrate_delay(), defined in init/calibrate.c. The code derives floating point precision using the integer kernel. Listing Two shows the initial portion of the function that carves out a coarse value for loops_per_jiffy, while Listing Three contains the part that fine-tunes its precision.
+Listing Two: Calculate a coarse value for loops_per_jiffy
+
+loop_per_jiffy = (1 << 12); /* Initial approximation = 4096 */
+printk(KERN_DEBUG “Calibrating delay loop… “);
+while ((loops_per_jiffy <<= 1) != 0) {
+ticks = jiffies;
+
+/* Wait till the start of the next jiffy */
+while (ticks == jiffies)
+ticks = jiffies;
+
+/* Delay */
+__delay(loops_per_jiffy);
+
+/* Did the wait last out the current jiffy? */
+ticks = jiffies – ticks;
+if (ticks) break;
+}
+Listing Two begins by assuming that loops_per_jiffy is greater than 4096. That translates to a processor speed of roughly one million instructions per second (MIPS). It then waits for the start of a new jiffy before experimenting whether the current value of loops_per_jiffy is acceptable. If the delay loop (__delay(loops_per_jiffy)) lasts beyond that jiffy, you have an upper bound for loops_per_jiffy and can proceed to the fine-tuning done in Listing Three.
+Listing Three: Increase the precision of loops_per_jiffy
+
+/* Start by reducing the value by a power of 2 */
+loops_per_jiffy >>= 1;
+loopbit = loops_per_jiffy;
+
+/* Gradually work on the lower-order bits */
+while (lps_precision– && (loopbit >>= 1)) {
+loops_per_jiffy |= loopbit;
+ticks = jiffies;
+
+/* Wait till the start of the next jiffy */
+while (ticks == jiffies)
+ticks = jiffies;
+
+/* Delay */
+__delay(loops_per_jiffy);
+
+if (jiffies != ticks) /* longer than 1 tick */
+loops_per_jiffy &= ~loopbit;
+}
+The fine-tuning starts by reducing the value of loops_per_jiffy by a power of two. It then gradually works on the lower-order bits and finds the exact combination when the jiffy boundary gets crossed. This yields a precise value for loops_per_jiffy. This calibrated value is used to derive an unscientific measure of the processor speed, known as BogoMIPS. You can use the BogoMIPS rating as a relative measurement of how fast a CPU can run.
+On a 1.6 GHz Pentium M laptop, the delay-loop calibration yielded a value of 6385059 for loops_per_jiffy. The BogoMIPS value announced was 3192.52.
+
+“Checking ‘hlt’ instruction… OK”
+Since the Linux kernel is supported on a variety of hardware platforms, the boot-up code checks for architecture-dependent bugs. The startup code, init/main.c calls the function check_bugs() defined in include/asm-your-arch/bugs.h to accomplish this. Verifying the sanity of the HLT instruction is one such check.
+The HLT instruction supported by x86 processors puts the CPU into a low-power sleep mode that continues till the next hardware interrupt occurs. The kernel uses the HLT instruction when it wants the CPU to be put in the idle state (see function cpu_idle() defined in arch/i386/kernel/process.c).
+For problematic CPUs, the no-hlt kernel command-line parameter can be used to disable the HLT instruction. If no-hlt is turned on, the kernel busy-waits when it’s idle, rather than keep the CPU cool by putting it in the HLT state.
+
+“Local APIC disabled by BIOS– reenabling”
+The Advanced Programmable Interrupt Controller (APIC) is the modern avatar of 8259 Programmable Interrupt Controller (PIC) devices. APICs provide more interrupt resources. Local APICs are one part of the APIC architecture and are local to each CPU on the system. I/O APICs are another part of the architecture and deliver interrupts generated by I/O devices to local APICs. Local APICs are essential in multi-processor systems.
+Interrupt sharing with traditional PICs is tricky. APICs reduce the need to share interrupts. Also APICs handle interrupts faster than PICs. Some BIOSes disable the APIC. You can re-enable it by adding lapic to the kernel command line.
+
+“Freeing initrd memory: 387k freed”
+initrd is a RAM disk that is loaded by the bootloader. It’s mounted as the initial root filesystem after the kernel boots to load additional modules required to mount the actual root filesystem. After mounting the actual root, the memory where initrd resides (387 K in this case) is freed by the kernel. Those pages are then doled out to other parts of the kernel that request memory.
+
+NET: “Registered protocol family 2”
+The Linux socket layer is a uniform interface through which user applications can access various networking protocols. Each protocol registers itself with the socket layer using a unique family number assigned to it (defined in include/linux/socket.h). Family number 2 in the above message stands for AF_INET, the Internet IP Protocol.
+Another registered protocol family often found in boot messages is AF_NETLINK (family 16). Netlink sockets are a special mechanism to communicate between the kernel and user-space processes using socket APIs. Features usually accomplished via netlink sockets include accessing the routing table and the Address Resolution Protocol (ARP) table (see include/linux/netlink.h for the full list). Netlinks are more suitable for such tasks compared to system calls since they are asynchronous, simpler to implement, and can be linked dynamically.
+Another commonly enabled protocol family is AF_UNIX (family 1). Unix domain sockets are used by programs like the X Window System for interprocess communication on the same system. They are used even if the machine is not connected to a network.
+
+“Probing PCI hardware (bus 00) ”
+The next phase of the boot process probes and initializes I/O buses and peripheral controllers. The kernel probes PCI hardware by walking the PCI bus, and then moves on to other subsystems. Take a look at Listing Four to see messages announcing initialization of the SCSI subsystem, the USB controller, the video chip (part of the 855 North-bridge chipset in this case), the serial port (8250 UART), PS/2 keyboard and mouse, floppy drives, ramdisk, the loopback device, the IDE controller (part of the ICH4 South-bridge chipset here), the touchpad, the Ethernet controller (e1000 in this case) and the PCMCIA controller. (The identity of the corresponding I/O device is enclosed within /* and */ in the listing.)
+Listing Four: Initializing I/O devices and Peripherals
+
+SCSI subsystem initialized /* SCSI */
+usbcore: registered new driver hub /* USB */
+agpgart: Detected an Intel 855 Chipset. /* Video */
+[drm] Initialized drm 1.0.0 20040925
+PS/2 Controller [PNP0303:KBD,PNP0f13:MOU]
+at 0×60,0×64 irq 1,12 serio: i8042 KBD port /* Keyboard */
+serial8250: ttyS0 at I/O 0x3f8 (irq = 4)
+is a NS16550A /* Serial Port */
+Floppy drive(s): fd0 is 1.44M /* Floppy */
+RAMDISK driver initialized: 16 RAM disks
+of 4096K size 1024 blocksize /* Ramdisk */
+loop: loaded (max 8 devices) /* Loop back */
+ICH4: IDE controller at PCI slot
+0000:00:1f.1 /* Hard Disk */
+/* … */
+input: SynPS/2 Synaptics TouchPad as
+/class/input/input1 /* Touchpad */
+e1000: eth0: e1000_probe: Intel(R) PRO/1000
+Network Connection /* Ethernet */
+Yenta: CardBus bridge found at
+0000:02:00.0 [1014:0560] /* PCMCIA/Cardbus */
+Some of these messages may manifest later on in the boot process if the drivers are dynamically linked to the kernel as loadable modules.
+
+“EXT3-fs: mounted filesystem with ordered data mode”
+The Ext3 filesystem has become the de facto Linux root filesystem. It adds a journaling layer on top of Ext2 filesystem; this layer logs file transactions to a journal before committing the actual changes to disk. Journaling lets Ext3 recover the filesystem quickly after a crash.
+Ext3 uses a kernel helper thread called kjournald to assist in journaling. Once Ext3 is operational, the kernel can mount the root filesystem and get ready for business:
+
+kjournald starting. Commit interval 5 seconds
+VFS: Mounted root (ext3 filesystem).
+
+“INIT: version 2.85 booting”
+init, the parent of all Linux processes, is the first program to run after the kernel finishes its boot sequence. In the last few lines of init/main.c, the kernel searches different locations in its attempt to locate init:
+
+if (execute_command) 
+  run_init_process(execute_command);  
+run_init_process("/sbin/init");
+…
+run_init_process("/bin/sh");
+panic("No init found. Try passing init= option to kernel.");
+
+init receives directions from /etc/inittab. It first executes system initialization scripts present in /etc/rc.sysinit. One of the responsibilities of this script is the activation of the swap partition, which triggers the boot message:
+
+Adding 1020560k swap on /dev/hda6
+
+Linux user processes own a virtual address space of 3 GB. Out of this, the pages constituting the working set are kept in RAM. However, when there are too many programs competing for memory resources, the kernel has to free up used pages and store them in a disk partition called swap. According to a rule of thumb, the size of the swap partition should be twice the amount of RAM. In this case, the swap partition lives in /dev/hda6 and has a size of 1020560 K bytes. /etc/fstab contains the following line:
+
+/dev/hda6 swap swap defaults 0 0
+
+init then goes on to run scripts present in the /etc/rc.d/rc X .d/, where X is the desired runlevel. A runlevel is an execution state corresponding to the desired boot mode. For example, full multi-user mode has a runlevel of 3, while graphical windowing mode has a runlevel of 5. If you see the message, INIT: Entering runlevel 3, init has started executing scripts in the /etc/rc.d/rc3.d directory. These scripts start the dynamic device naming subsystem (udev), load kernel modules responsible for driving networking, audio, storage, and so on:
+
+Starting udev:  [ OK ]
+Initializing hardware... network audio storage [Done]
+…
+
+init finally spawns terminals on virtual consoles to permit logins.
+
+Looking at the Sources
+Kernel boot starts with the execution of real mode assembly code found in the arch/i386/boot/ subdirectory. Look at arch/i386/kernel/setup.c to see how the protected mode kernel obtains information gleaned by the real mode kernel.
+The first boot message is printed by code that’s part of init/main.c. Dig inside init/calibrate.c to learn more about BogoMIPS calibration. Look at arch/i386/kernel/apic.c to discover more on APIC handling, and review asm/include/bugs.h for an insight into architecture-dependent checks.
+
+Sreekrishnan Venkateswaran has been working for IBM India for ten years. His recent projects include porting Linux to a pacemaker programmer and writing firmware for a lung biopsy device. You can reach Krishnan at class="emailaddress">krishhna@gmail.com.
+
+Comments are closed.
+	

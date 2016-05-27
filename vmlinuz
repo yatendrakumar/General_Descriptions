@@ -1,0 +1,15 @@
+what is vmlinuz image >?????/
+
+statically linked executable file contain linux kernel in 
+one of the object file format supported by linux 
+( include ELF, COFF & a.out )
+
+vmlinuz ( z is zipped )
+
+while creating a bootable kernel image the kernel is 
+also  compressed using Zlib algo 
+or since 2.6.30 using LZNA or BZIP2
+which require very small decompression stub to be include 
+in the resulting image
+
+

@@ -1,0 +1,12 @@
+An operating system is a computer program that supports a 
+computer's basic functions, and provides services to other
+programs (or applications) that run on the computer. 
+
+The applications provide the functionality that the user of
+the computer wants or needs. The services provided by the 
+operating system make writing the applications faster, 
+simpler, and more maintainable. If you are reading this
+web page, then you are using a web browser (the application
+program that provides the functionality you are interested in),
+which will itself be running in an environment provided by an
+operating system. 

@@ -1,0 +1,32 @@
+/***************************************************************************************************/
+New Source  ( ICS ) 
+
+Apply patch for particular device
+change or copy the device/ti/beagleboard/vendorsetup.sh 
+add_lunch_combo beagleboard-eng 
+or 
+add_lunch_combo full_panda-userdebug
+
+
+/***************************************************************************************************/
+
+source ./build/envsetup.sh
+lunch 
+make TARGET_BOARD=beagleboard
+or 
+make TARGET_BOARD=panda
+
+
+/***************************************************************************************************/
+while building ( creating the filesystem ( ICS android ) ) 
+
+make: *** No rule to make target `out/target/product/beagleboard/kernel', needed by `out/target/product/beagleboard/boot.img'.  Stop.
+
+export TARGET_NO_KERNEL=true 
+
+/***************************************************************************************************/
+
+
+
+/***************************************************************************************************/
+

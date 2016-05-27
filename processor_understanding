@@ -1,0 +1,91 @@
+
+When a computer interprets assembly level instructions, these 
+instructions are turned into their binary equivalents for the 
+CPU to read. 
+
+When the CPU executes the instructions, it interprets the opcode 
+part of the instruction into individual "microprograms", containing
+their microcode equivalents. Just so you know, a full assembly 
+instruction consists of an opcode and any applicable data that 
+goes with it, if required (e.g. register names, memory addresses).
+
+Microcode instructions are extremely low-level (more so then 
+assembly), and control the actual digital signals which control 
+the flow of logic in the microprocessor. 
+
+For example, one microcode instruction could update a condition 
+code register flag with a new value, or connect a CPU register 
+with one of the ALU units. More complex tasks are possible, 
+but this shows you the general idea of what microcode is used for.
+
+The general flow from compilation to execution is as follows. 
+
+The assembly instructions are assembled (turned into their binary 
+equivalent 0s and 1s, or from now on, logic signals). 
+These logic signals are in-turn interpreted by the CPU, and turned 
+into more low-level logic signals which direct the flow of the CPU 
+to execute the particular instruction. 
+
+This can take one or more clock cycles, depending on the processor's 
+architecture and design (most processor reference manuals tell you 
+how many clock cycles it takes to execute a particular instruction, 
+like this one for example).
+
+All of this is done with hard-programmed microcode (physically 
+embedded within the processor in some kind of ROM, set during 
+manufacturing), which directs the flow through actual low-level 
+logic gates. 
+
+This provides an interface between the abstract assembly instructions 
+and the physical electrical logic in the processor.
+
+So, in summary, processor instructions are assembled and loaded by 
+the processor. The processor will then use these instructions to 
+look up the microprogram (in the form of microcode) corresponding 
+to that particular instruction, which is what "actually" executes 
+the instruction. Once the microcodes for the particular instruction 
+have been executed (which can take one or more clock cycles), 
+the processor executes the microcode to fetch the next instruction, 
+and the cycle repeats.
+
+The processor doesn't really 'know' what the commands are. 
+The commands are just binary patterns that cause the processor 
+to do what we interpret the commands to mean.
+
+For example, an ADD-R1-into-R2 operation will cause registers 1 and 2's
+values to reach the ALU (arithmetic and logic unit), cause the ALU 
+to use the output of the adder instead of the various other stuff, 
+and cause the output of the ALU to replace the value in register 2. 
+
+There are simple logic circuits to achieve all of these things 
+(multiplexer, adder, counter, ...), although real processors use very 
+complicated optimizations.
+
+It's sortof like you're asking how a car knows to slow down when you 
+press the brakes. The car doesn't know, the brake pedal just happens 
+to indirectly control how hard pads are pressed against the wheels.
+
+*********************************************************************************
+
+    Take, for example, the instruction that tells an x86/IA-32 processor
+ to move an immediate 8-bit value into a register. The binary code for 
+this instruction is 10110 followed by a 3-bit identifier for which register
+to use. The identifier for the AL register is 000, so the following 
+machine code loads the AL register with the data 01100001.
+
+    10110000 01100001
+
+This binary computer code can be made more human-readable by expressing 
+it in hexadecimal as follows
+
+    B0 61
+
+    Here, B0 means 'Move a copy of the following value into AL', and 61 
+is a hexadecimal representation of the value 01100001, which is 97 in 
+decimal. Intel assembly language provides the mnemonic MOV (an 
+abbreviation of move) for instructions such as this, so the machine 
+code above can be written as follows in assembly language, 
+complete with an explanatory comment if required, after the semicolon. 
+This is much easier to read and to remember.
+
+

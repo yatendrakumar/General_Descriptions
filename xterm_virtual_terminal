@@ -1,0 +1,4 @@
+To open the virtual terminal with script already exist named as "script.sh"
+
+
+xterm -e "bash ~/script.sh;bash"

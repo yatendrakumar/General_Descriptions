@@ -1,0 +1,20 @@
+what is simulator ????
+
+write a program that draw the calculator's display and keys and when
+user clicks on the keys your progra, does what the old calculator did.
+
+duplicate the behaiour of device
+
+
+what id emulator ????
+
+you get a dump of the calculator firmware , then write a program 
+that loads the firmware and interpret in the sameway the u.p in the 
+calculator did.
+
+duplicate the inner working of the device.
+
+in emulator s/w platform is created on which the emulated code can be run
+in ahost computer having different h/w and a different instr set.
+
+  

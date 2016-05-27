@@ -1,0 +1,15 @@
+The Linux kernel debugger (KDB) allows you to debug the Linux kernel. 
+This aptly named tool is essentially a patch to the kernel code that 
+lets hackers access kernel memory and data structures. 
+One of the main advantages of KDB is that it does not require an 
+additional machine for debugging: you can debug the kernel that you 
+are running on.
+
+The latest version of KDB available (at the time this article was written)
+is 4.2. You'll need to download and apply two patches. 
+One is the "common" patch that contains the changes for the generic 
+kernel code, and the other is the architecture-specific patch.
+
+
+
+

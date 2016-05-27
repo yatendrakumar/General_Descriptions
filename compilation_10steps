@@ -1,0 +1,41 @@
+
+
+kernel compilation steps for grub 
+
+
+1) check whether .config is there or not then generate it by 
+	make menuconfig 
+change the configurations and save that 
+
+2) generated then put it into the /boot/
+with the name suitable for creating the initrd image i.e config-<version name>
+	eg. config-3.6.9
+	
+	
+3) then make -j 8,4,12 or no need to give -j ...( only make )
+	it will give the vmlinux image ( not needed )
+
+4) create another compresssed image 
+	bzImage by 
+	make bzImage 
+
+5) put this into the /boot/ with cahnging the name 
+	vmlinuz-<version-name>
+understandable to the grub 
+
+you can  do make modules && make modules install but after this no need to use 7th step  it will automatically create initrd image in /boot/
+
+6) update-grub 
+
+7) update-initramfs -c -k <version-name> (((( 3.6.9 ))))
+	if not using make modules && make modules install
+
+8) update-grub 
+
+9) init 6
+
+10)	 enjoy madi 
+
+							yatendra kumar 
+							8792776056
+							batch 61 ( global edge ) ( p.m.g )

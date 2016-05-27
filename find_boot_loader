@@ -1,0 +1,8 @@
+
+to find which boot loader you are using 
+
+
+sudo dd if=/dev/sda bs=512 count=1 2>&1 | grep GRUB - For GRUB
+sudo dd if=/dev/sda bs=512 count=1 2>&1 | grep LILO - For LILO
+sudo dd if=/dev/sda bs=512 count=1 2>&1 | grep ACRON - For Acronis
+sudo dd if=/dev/sda bs=512 count=1 2>&1 | grep RED - For RedBoot 

@@ -1,0 +1,33 @@
+Cyclone for Renesas Overview
+
+
+P&E Microcomputer Systems' Cyclone for Renesas is an extremely 
+flexible tool designed for in-circuit flash programming of Renesas
+ R8C, M16C and M16C/80, M32C, H8 and H8S/Tiny devices.
+
+By connecting to the debug header on the target, the Cyclone 
+can program internal memory on a Renesas processor or external 
+flash connected to the processor's address/data bus. 
+
+The processor or memory device can be mounted on the final printed 
+circuit board before programming.
+
+The Cyclone may be operated interactively via Windows based 
+programming applications as well as under batch or dll commands 
+from a PC. 
+
+Once loaded with data by a PC it can be disconnected and operated 
+manually in a completely stand-alone mode via the LCD menu and 
+control buttons. The Cyclone has over 7Mbytes of non-volatile memory, 
+which allows for the onboard storage of multiple programming images. 
+When connected to a PC for programming or loading it can communicate 
+via the ethernet, USB, or serial interfaces.
+	
+The Cyclone comes with intuitive configuration software, as well 
+as easy to use automated control software. Support is currently 
+available for the R8C, M16C/M32C, and H8 families - you may view 
+a list of supported devices here. Please contact us for information 
+about support for other devices.
+
+
+

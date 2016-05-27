@@ -1,0 +1,3 @@
+To revert all the changes what you have done.
+
+repo sync -d

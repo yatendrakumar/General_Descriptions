@@ -1,0 +1,9 @@
+// this is to run command in another terminal with pts known
+
+
+Be root in both the terminal   
+ex :run this in pts0 and execute this 
+
+ttyecho -n /dev/pts/3 ls
+
+

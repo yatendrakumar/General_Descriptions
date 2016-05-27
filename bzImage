@@ -1,0 +1,8 @@
+what is bzImage ????
+
+bzImage is a specific format it contains concatenated 
+bootsec.o setup.o misc.o piggy.o .
+
+piggy.o contain the vmlinux file in its data section 
+
+

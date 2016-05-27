@@ -1,0 +1,323 @@
+/*
+ 	prepared by yatendra kumar sharma  	
+	phone number 8792776056 
+*/
+
+DAY 1
+
+system call ---> 
+	1) o.s provides their services via system call API
+	2) system call API are implemented using system libraries and 
+ 	 system call interface layer of o.s 
+	3) system call API are depend on interrupt handling mechnism of h/w and o.s
+	
+system is computing system and we can say here kernel is subsystem of computing system .
+
+types of subsystems --->
+	1) process management 
+	2) phy and virtual memory subsystem 
+	3) file and logical file manegement subsystem  
+	4) i/o subsystem 
+	5) device drivers
+	6) interrupt subsystem 
+	7) IPC subsystem 
+	8) timer subsystem
+	9) many more 
+
+	subsystem are used to manage the components ( same name with manager eg. interrupt manager ).
+	
+types of components --->
+
+	1) s/w components 
+	2) h/w components 
+
+but here o.s is made up of many s/w componenets that manages h/w resources and logical resources. 
+
+work of s/w components --->
+
+	1) used to provide the environment ( developer and controlled ) and funtionality 
+	to the application s/w components 
+	( assembler/compiler, system libraries or GUI interface )
+
+	2) initialize the h/w resources  ( device drivers and i/o subsystem ) 
+
+	3) manage the h/w resources  ( i/o subsystem , file system manager, 
+	physical/virtual memory manager, cpu scheduler ).
+
+	4) provide interface between user and computing system ( system libraries, system utilities )
+
+s/w components are of 2 type core and non-core components-->
+
+core components -->  used for manage and initialize the h/w and provide services to the non-core 
+	components , application and user ( non-core- libraries , utilities and execution framework 
+	that enable the user/admin to interface and utilize the services of o.s 1 and 4 in above case).
+	( core - device driver, i/o subsystem ) (2 and 3 in above case ) 
+
+-->non-core components are residing in user space.
+
+-->all components are not standalone components i.e they are depend on each other 
+-->all components are co-exists in layer and hierarchical form.
+
+-->o.s is called as layer and modular model 
+	layer --> 1 components are depend on each other and flow of control / commands /data 
+		is strict  ( higher to lower level ) 
+	modularity -->core features can be added and remove as needed ( modules ) 
+
+-->some of the layers can interact very closely with hardware controller called HAL layer ( 1 type of 
+component )
+  
+-->i/o subsystem and device driver are 2 they are using HAL to do work with h/w 
+-->HAL is in machine language ( particular or architecture specific ) and device driver is in 
+high level language.
+
+-->for particular arch/Board HAL is different so if o.s having particular HAL for particular Board 
+on that arch/board that o.s will be loded 
+
+/*********************************************************************************************/
+back to system call --------------->
+
+system call interaface layer will invoke the trap handler when system call API is invoked 
+and as the rule of system call API it invoke appropraite system call system routine in appropriate 
+subsystem .
+
+process management subsystem having IPC , scheduler and memory management 
+
+may be schduler can take as seperate subsystem and can interact directly HAL layer 
+( hardware control )( ex. context switch )
+top most layer of memory management called as process/vitual management layer and lower 1 
+called as physical memory manager.
+ 
+same with file subsystem layer.
+device management having device driver and i/o subsystem
+
+/*****************************************************************************************/
+
+user space and system space are divided as memory regions and some attributes and these attributes 
+setting are taken care by system and processor rules.
+for user space may be this attribute is not set.
+
+user space and system or kernel space is nothing is the memory regions containing kernel 
+or user components.
+
+user space inlcude ( non core component of o.s and application ).
+kernel include ( core components having kernel data structure ).
+and those memory regions are non-contigous but put together.
+
+-->priviledge and non priviledge mode are controlled via processor's control registers. 
+
+-->these division user and system mode or less or more priviledge mode are done by some 
+hardware techniques   ( processor is divide into layers ( data / instruction flow ) 
+and if less priviledge mode than it will block it in some layer) 
+( like here for system memory it will block the layer for user coming instruction ).
+
+all table like term will be stored in the kernel data structure ( i.e memory ) 
+/******************************************************************************************/
+system interrupt handling --> interrupt management 
+
+-->interrupt subsystem is there that will take care of interrupt table and it is very archtecture 
+specific and managed with the help of HAL.
+-->for each interrupt type/no there is particular handler, o.s will point or setup the
+ control register of processor to point to the interrupt handler table base address.
+
+-->suppose h/w timer interrupt came all other h/w interrupt will be disabled swicth will happen
+ cpu ( less to more pv mode ) stack switch ( usr to system ).
+-->stack switch will be done with the help of h/w and several register will be modified and will
+ save into the system stack.
+-->cpu will execute the jump instruction and startexecution of the paticular handler and  
+if handler completes its job it will execute the special instruction and this will reverse 
+back all the instruction taken. 
+
+-->cpu will return back to that executed instruction  and resumes execution normally.
+
+--> special jump is similar to h/w interrupt but it is a machine instruction implemented by 
+interrupt mechanism.
+
+/*******************************************************************************************/
+
+process management
+
+about process --> having pd ( process descriptor ) ( unique and describing several resource 
+& information ) 
+
+	1) process id 
+	2) process state 
+	3) scheduling parameter ( policy , time slice and details ) 
+	4) system stack address ( run time context address )
+	( system stack wil store at the time of blocked, waiting, system call jump execution )
+	5)maintain address of active file of this process.
+	6) maintain memory descriptor ( virtua and physical memory location of the process )
+	7) field which help system to put the process in ready queue ( 1 for ech processor )
+	or wait queue ( 1 for each resources ) ( 1 for each i/o channels ) 
+	8) credentials
+
+if resources are there for process , the process will be in ready queue and if not in wait queue.
+
+when the process is running in the processor it can be prempted by higher priority or due to end 
+of time slice.( time slice exhausted ) and added to ready queue not in wait queue 
+( in case of premption )  
+
+process creation -->
+	1) new pd will be created in pd table.
+	2) new pid will be given to process.
+	3) resources and object allocated and added to pd 
+	4) that pd will be added to the 1 or more list processmanagement subsystem ( ipc, 
+	memory management, scheduler ) 
+
+resources of the process will be there till termination.
+normal termination-->
+-->if a process attempts illegal activity ( as i told processor is also divided in layers to 
+execute the priviledge instruction ) in this case processor will generates the h/w exception 
+like a interrupt and handled by exception handler stored with the trap handler and interrupt handler .
+
+-->exception is generated when bypassing system call and trying to access core services of o.s.
+
+now process terminate so scheduler will be invoked may be beacuse of system call API termination 
+( termination system call ) or exception handler will invoke the scheduler.
+
+may be due to time slice ending  ( time slice exhausted ) 
+
+/**************************************************************************************************/
+
+system call API and system call system routine	-->
+
+system call API are implemented using user space system libraries but system call system routine is implemented in different components of o.s.
+
+they are intracting by one to one mapping. 
+
+system call API is needed to invoke the system call system routine.
+
+system call API can be implemented using interrupt mechanism.
+
+use of system call API --->
+	1) process creation and termination 
+	2) thread creation and termination 
+	3) i/o access 
+	4) memory allocation and deallocation 
+	5) syncronization 
+	6) data exchange 
+	7) file input/output access 
+	8) many more  
+
+/**************************************************************************************************/
+
+
+DAY 2 
+chapter 2 mjb
+
+when system call API is invoked there is particular entry in system call libraries. 
+each system call lib is encoded in  assembly language and execute the trap instruction 
+( system call lib contains ) which when execute cause an intrrupt results in switch from user
+to kernel mode.
+
+process will call lib as it call any function. create stack for lib functions. when trap instr 
+executed register will besaved, mode will change and kernel stack will generate. 
+
+
+/***********************************************************************************/
+
+buffer allcation ----> for figure MJB book
+
+--> buffer pool is  the part of the kernel data stucture and initialize at the time of system start 
+buffer pool is depend on the memory size and system performation.
+
+--> every disk is logicaly  detected by the kernel 
+i.e every filesystem ( unit number ) is transaleted in logical device number by the disk driver 
+that device number is used by kernel for every file system access 
+
+suppose we have 2 file system ext2 and ext3 
+then disk driver differentiate those drives by logical  device number  ( drive c, drive d in windows )
+each logical device having blocks treated as block number 
+
+in bufferpool if we have 2 file system then we have 2 buffer list ( hash queue ) and free list.
+buffer pool is only 1 but buffer list may be more 
+
+buffer header having buffer header and data array pointer.
+
+we have hash queue and free buffer list ( both are circular doubly linked list ) 
+
+--->when disk block is requested then process will use getblk algo and will search into the buffer cache 
+if itis there then return immediately other wise kernel will call the disk driver to schdule for read request 
+and goes to sleep for event I/O completion.disk driver will notifies the disk controller  hardware that it 
+want to read data and disk controller will transfer the data into buffer.
+
+in free list case --> using recently accessed buffer 
+the recently free buffer put at the end( tail ) of the list or at the head of the list ( in case of error 
+( I/O  access error, hardware access problem ( in these case disk controller will not inform CPU by 
+giving intrruptand returned back to free list )) ) not in the middle .  
+
+1 disk block only allocated to one particular buffer at a same time.
+
+put buffer in hash queue is same  
+hashqueue has make by using combination of device number and block number so 
+for put the disk block into the memory we want some searching acc. to the device number and block number 
+hash value in the hash queue if location found we will put there or will make location there by some mechenism.
+ 
+we will get the block detail ( block location is there in hash queue or not ) from the hash queue and 
+for that block we have to find buffer from the free list.
+
+if /dev/sdb2 and /dev/sdb3 are there then 2 buffer list ( hash queue ) is there and 2 free list.
+
+buffer may be in hash queue and free list at same time .
+
+buffer allocation is the case of system call only, not user space access 
+
+when disk  block is accessed then first it will check into the hash queue first then free list 
+
+read and write access -->
+high level modules ( file sub systenm ) will take care of fast access so it will take not only 1 but 
+2 disk block from the disk at same time ( time constraints ) ( read ahead algo )
+1st will be syncronous that means the disk driver will read the data block into buffer ( will be in sleep 
+for I/O completion on 1st block ) and will not wait for 2nd. when 2nd will complete disk controller 
+will give intruupt to CPU that second was asyncronous and will release the buffer.( for other process use ) 
+( like delayed write case ).
+same with write operation 
+ 
+asyncronous and delayed write--> 
+in asyncrounous it will not wait for I/O completion but in delayed  write itwill do as soon as possible and 
+make that as old so it will add to head not to tail.
+
+at time of access if kernel request for the second buffer then it will checkfirst asyncrounous read buffer 
+and will provide that buffer to the block location.
+
+
+we have 5 scnerios for buffer allocation 
+
+1) suppose i access the disk block from the drive c ( logicaly or /dev/sda2 in unix ) 
+
+suppose i requested the 7th block data of device /dev/sdb2 so kernel high level algo will serach 7th block
+and /dev/sdb hash value and search that in the hash table of particular f.s.
+
+soppose it find the block location for alocation in the hash queue ( 7th block ) and its buffer is free 
+then it will allocate that buffer at that particular location and data manipulation on that buffer.
+
+applicable to all scnerio --->
+buffer will put on busy ( because other process can access that buffer if free ) 
+after completion it will release buffer so other process who is waiting for that buffer to free or process 
+waiting as there was no free buffer will wakeup and take that buffer.
+
+2) suppose i access the disk block from the drive c ( logicaly or /dev/sda2 in unix ) 
+
+suppose i requested the 7th block data of device /dev/sdb2 so kernel high level algo will serach 7th block
+and /dev/sdb hash value and search that in the hash table of particular f.s.
+
+not find the location to put buffer for that block so it will take the buffer from free list and will make 
+the location for that block allocated buffer in hash queue.
+
+3) block location is not there ( scnerio 2 ), it will get the buffer from the free list but free list 
+getting buffer is "delayed write" so asynchronous write for the delayed write buffer into the disk 
+and release delayed write buffer for other and will serach for other free buffer in free list.if again delayed 
+write then same process.
+
+4) block location is not there not also free list is empty 
+it will wait for any free buffer.
+
+5) block location is there but buffer is busy 
+that means somebody is using that disk block as i told you 1 block == 1 buffer otherwise data will currupt
+so itwill wait for that buffer to free.
+it will not assign that block dffrent buffer.
+here race condition for free block can occur --->
+as procee A is using that buffer and process B wants to use that buffer so Process B will go to sleep
+but When process complete its task Process C access that because of waiting free buffer so it will 
+manipulate that may be in different mod list so when process B will wake up itwill check buffer but 
+buffer is not there so it will take new buffer from free list.
+

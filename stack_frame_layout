@@ -1,0 +1,15 @@
+
+compile the code using this command on 64bit arch  
+gcc -masm=intel -march=i386 -m32 -S z.c -o z.m
+
+for getting information on the stack creation when function calling 
+
+eli.thegreenplace.net/2011/02/04/where-the-top-of-the-stack-i`s-on-x86/
+
+this is for the 64 bit arch 
+
+http://eli.thegreenplace.net/2011/09/06/stack-frame-layout-on-x86-64/
+
+.cfi_def_offset explanation 
+
+http://stackoverflow.com/questions/7534420/gas-explanation-of-cfi-def-cfa-offset
