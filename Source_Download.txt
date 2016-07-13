@@ -1,0 +1,153 @@
+**************************************************************************************************************
+Android Source download:
+**************************************************************************************************************
+
+# Create bin directory in home if not present
+mkdir ~/bin
+# Set path
+PATH=~/bin:$PATH
+
+***********************************
+#Download the Repo tool and ensure that it is executable: 
+curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+chmod a+x ~/bin/repo Or chmod 0777 ~/bin/repo
+
+***********************************
+# Make working directory. Create an empty directory to hold your working files
+cd ~/
+mkdir WORKING_DIRECTORY
+cd WORKING_DIRECTORY
+
+***********************************
+# Set Http Post Buffer size 
+#You may find the default post buffer of your git client is too small to push large details to Gitblit. 
+Sometimes this cam be observed on your client as hanging during push. 
+Other times it can be observed by git erroring out with a message like : error: RPC failed; result=52, HTTP code = 0
+Use :git config --global http.ppostBuffer 524288000
+Places to add this (In any file you can add)
+1. ~/.git/config
+2. /etc/gitconfig
+3. ~/.gitconfig
+4. ~/.config/git/config
+
+***********************************
+# Run repo init to bring down the latest version of Repo with all its most recent bug fixes. 
+You must specify a URL for the manifest, which specifies where the various repositories included in the Android source will be placed within your working directory. 
+repo init -u https://android.googlesource.com/platform/manifest
+
+***********************************
+# To check out a branch other than "master", specify it with -b: 
+repo init -u https://android.googlesource.com/platform/manifest -b android-5.0.0_r6
+
+# If want to configure by your name/ID use
+repo init -u https://android.googlesource.com/platform/manifest -b android-5.0.0_r6 --config-name yatendra
+
+***********************************
+# To pull down the Android source tree to your working directory from the repositories as specified in the default manifest, run
+repo sync
+
+***********************************
+# Using a Local mirror
+mkdir -p /usr/local/aosp/mirror
+cd /usr/local/aosp/mirror
+repo init -u https://android.googlesource.com/mirror/manifest --mirror
+repo sync
+
+# Once the mirror is synced, new clients can be created from it. Note that it's important to specify an absolute path: 
+mkdir -p /usr/local/aosp/master
+cd /usr/local/aosp/master
+repo init -u /usr/local/aosp/mirror/platform/manifest.git
+repo sync
+
+***********************************
+# Finally, to sync a client against the server, the mirror needs to be synced against the server, then the client against the mirror:
+
+cd /usr/local/aosp/mirror
+repo sync
+cd /usr/local/aosp/master
+repo sync
+
+***********************************
+# Note: Copy source as backup in Source directory
+
+***********************************
+# download factory binaries for Device (Without this android will not bring up)
+https://developers.google.com/android/nexus/drivers
+# It will list out all the device with android versions like -
+Binaries for Nexus 5 (GSM/LTE) ("hammerhead")
+
+    Android 4.4 (KRT16M)
+    Android 4.4.2 (KOT49H)
+    Android 4.4.3 (KTU84M)
+    Android 4.4.4 (KTU84P)
+    Android 4.4.4 Release 2 (KTU84Q)
+    Android 5.0 (LRX21O)
+    Android 5.1.1 (LMY48B)
+     
+# Select android version
+# Download all the links related to Devices binaries
+# Extract all the .tgz files and execute them in terminal
+Press Enter and space till prompt has not come 
+>> Type "I ACCEPT" if you agree to the terms of the license:
+Type "I ACCEPT" then Enter
+# It will create the device folder which is needed to bring up android for particular device
+
+**************************************************************************************************************
+Kernel Source download:
+**************************************************************************************************************
+#Go to site https://android.googlesource.com/kernel/msm.git. Search for particular version "android-msm-hammerhead-3.4-lollipop-mr1". Click and Download
+#set enviroment variables
+export ARCH=arm
+export SUBARCH=arm
+export CROSS_COMPILE=arm-2010q1/bin/arm-none-linux-gnueabi-
+
+***********************************
+#Set Path for Kernel and Android
+#Go to android source folder and export path
+export ANDROID_PATH=$PWD
+#Go to android Kernel folder and export path
+export KERNEL_PATH=$PWD
+
+**************************************************************************************************************
+Building Sources:
+**************************************************************************************************************
+# JDK version should be Proper.
+echo $JAVA_HOME
+echo $ANDROID_JAVA_TOOLCHAIN
+
+# Check the links manaully
+ls -l /etc/alternatives/ja*
+# If not set properly you can set JAVA Path as
+export JAVA_HOME=/usr/lib/jvm/jdk1.7.0_72/ 
+Or 
+Use update-alternatives for all ja* e.g update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk1.7.0_72/bin/java
+
+After Setting java version just do lunch for android source 
+
+# Your source is downloaded and ready for build
+Build Kernel:
+# go to source directory 
+cd ${KERNEL_PATH}
+make hammerhead_defconfig
+make zImage-dtb
+
+Copy zImage-dtb to particular device folder (Here lge/hammerhead-kernel for Nexus5)
+cp ${KERNEL_PATH}/arch/arm/boot/zImage-dtb  ${ANDROID_PATH}/device/lge/hammerhead-kernel/
+
+Build Android:
+# go to source directory 
+cd ${ANDROID_PATH}
+source build/envsetup.sh
+lunch aosp_hammerhead-userdebug 
+> for Nexus 5
+make -j4
+
+**************************************************************************************************************
+Flashing device:
+**************************************************************************************************************
+cd ${ANDROID_PRODUCT_OUT}
+adb reboot bootloader
+sudo fastboot flash boot boot.img
+sudo fastboot flash system system.img
+sudo fastboot flash userdata userdata.img
+sudo fastboot reboot
