@@ -1,0 +1,29 @@
+Kernel
+************************************
+This layer enables raw H/W access. Android uses linux's input sub system (evdev) for sensor devices.
+ * The input sub system is an abstraction layer between i/p devices and i/p handlers.
+ * The i/p devices capture physical inputs and produces i/p events.
+ * The i/p events then go through the i/p core and are dispatched to any subscribed handlers, 
+   which in turn make them available through the standard UNIX file interface /dev/input/eventX.
+ * Thus, applications can access the raw sensors data as an i/p events by calling POSIX system calls
+ 
+ HAL
+************************************
+It is a user space layer that interface with the kernel.
+ * It polls the i/p events from kernel (/dev/input/eventX) for reading sensor data 
+   and provides a unifying H/W interfaces for other user space process.
+ * This layer also hides vendor specific details.
+ * HAL is loaded into User-Space process as a shared library.
+
+Sensor Service
+************************************
+It Uses HAL to access raw sensor data. This layer is in fact part of a system process that starts from system boot time.
+2 things-
+ * It re formats raw H/W sensor data using application friendly data structure.
+ * It fuses reading from multiple H/W sensors to generate S/W sensors data.
+
+Sensor manager
+************************************
+Is an Android library linked to each application at run time.
+ * It Provides registration and de registration calls for app implemented event handlers.
+ * Once app registers an event handler, sensor Manger's sensor thread reads sensor data from a sensor service.
