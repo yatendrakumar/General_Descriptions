@@ -38,6 +38,17 @@ git push origin branch_name
 	$ git config --global alias.last 'log -1 HEAD'
 		$ git last
 
+# Important commands
+git am /tmp/0001-sensors-remove-PMD.patch
+git am --abort
+git format-patch -3
+git show 45e489ab3a9b18605e8c0af66aeb2434b7db20fb
+git blame filename (to see changes in files with commit id)
+git log --format=full
+git --git-dir=$sensor/.git/ --work-tree=$sensor/ diff
+git --git-dir=$sensor/.git/ --work-tree=$sensor/ diff --stat
+git rebase --continue
+
 # Tagging:
 	* Listing Your Tags
 		$ git tag
@@ -95,11 +106,3 @@ git push origin branch_name
 		$ git checkout -b version2 v2.0.0
 		Of course if you do this and do a commit, your version2 branch will be slightly different than your v2.0.0 
 		tag since it will move forward with your new changes, so do be careful.
-	
-	
-	
-	
-	
-	
-	
-	
