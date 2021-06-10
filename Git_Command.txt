@@ -32,6 +32,18 @@ git commit -am "Commiting message"
 # push it into the git repo
 git push origin branch_name
 
+#error: cannot stat <py file>: Filename too long
+git config core.longpaths true
+
+# to reset the code or sync to latest code
+	git reset --hard HEAD
+	git clean -xffd
+	git pull
+or use 
+	git reset --soft HEAD
+
+# move to any old gerrit (from git log)
+	git checkout <Commit number>
 # Git Aliases
 	$ git config --global alias.co checkout
 	$ git config --global alias.unstage 'reset HEAD --'
